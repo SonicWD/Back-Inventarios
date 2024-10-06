@@ -26,7 +26,7 @@ inv/Scripts/Activate
 pip install -r requirements.txt
 ```
 
-### iniciar el bot
+### iniciar el proyecto
 ```
 uvicorn main:app --reload
 ```
