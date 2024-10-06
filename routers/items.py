@@ -9,28 +9,29 @@ router = APIRouter(
     tags=["items"],
     responses={404: {"description": "No encontrado"}}
 )
-#obtener items
+
+# Obtener items
 @router.get("/", response_model=List[schemas.Item])
 def obtener_items(
     skip: int = 0,
     limit: int = 100,
     categoria_id: int = None,
-    perishable_type: schemas.PerishableType = None,
-    is_active: bool = None,
+    tipo_perecedero: schemas.TipoPerecedero = None,
+    esta_activo: bool = None,
     db: Session = Depends(get_db)
 ):
     query = db.query(models.Item)
     
     if categoria_id:
-        query = query.filter(models.Item.category_id == categoria_id)
-    if perishable_type:
-        query = query.filter(models.Item.perishable_type == perishable_type)
-    if is_active is not None:
-        query = query.filter(models.Item.is_active == is_active)
+        query = query.filter(models.Item.categoria_id == categoria_id)
+    if tipo_perecedero:
+        query = query.filter(models.Item.tipo_perecedero == tipo_perecedero)
+    if esta_activo is not None:
+        query = query.filter(models.Item.esta_activo == esta_activo)
     
     return query.offset(skip).limit(limit).all()
 
-#obtener item por id
+# Obtener item por id
 @router.get("/{item_id}", response_model=schemas.Item)
 def obtener_item(item_id: int, db: Session = Depends(get_db)):
     item = db.query(models.Item).filter(models.Item.id == item_id).first()
@@ -38,11 +39,11 @@ def obtener_item(item_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Item no encontrado")
     return item
 
-#crear item
+# Crear item
 @router.post("/", response_model=schemas.Item)
-def crear_item(item: schemas.ItemCreate, db: Session = Depends(get_db)):
+def crear_item(item: schemas.CrearItem, db: Session = Depends(get_db)):
     # Verificar si existe la categoría
-    if not db.query(models.Category).filter(models.Category.id == item.category_id).first():
+    if not db.query(models.Category).filter(models.Category.id == item.categoria_id).first():
         raise HTTPException(
             status_code=404,
             detail="La categoría especificada no existe"
@@ -61,11 +62,11 @@ def crear_item(item: schemas.ItemCreate, db: Session = Depends(get_db)):
             detail=f"No se pudo crear el item: {str(e)}"
         )
 
-#actualizar item existente
+# Actualizar item existente
 @router.put("/{item_id}", response_model=schemas.Item)
 def actualizar_item(
     item_id: int,
-    item: schemas.ItemCreate,
+    item: schemas.CrearItem,
     db: Session = Depends(get_db)
 ):
     db_item = db.query(models.Item).filter(models.Item.id == item_id).first()
@@ -73,8 +74,8 @@ def actualizar_item(
         raise HTTPException(status_code=404, detail="Item no encontrado")
     
     # Verificar si existe la categoría si se está actualizando
-    if item.category_id:
-        if not db.query(models.Category).filter(models.Category.id == item.category_id).first():
+    if item.categoria_id:
+        if not db.query(models.Category).filter(models.Category.id == item.categoria_id).first():
             raise HTTPException(
                 status_code=404,
                 detail="La categoría especificada no existe"
@@ -93,7 +94,8 @@ def actualizar_item(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Error al actualizar el item: {str(e)}"
         )
-#eliminar item
+
+# Eliminar item
 @router.delete("/{item_id}")
 def eliminar_item(item_id: int, db: Session = Depends(get_db)):
     item = db.query(models.Item).filter(models.Item.id == item_id).first()

@@ -6,33 +6,34 @@ from database.database import get_db
 
 router = APIRouter(
     prefix="/categorias",
-    tags=["categorias"],
+    tags=["categorías"],
     responses={404: {"description": "No encontrado"}}
 )
-#obtener categorias
-@router.get("/", response_model=List[schemas.Category])
+
+# Obtener categorías
+@router.get("/", response_model=List[schemas.Categoria])
 def obtener_categorias(
     skip: int = 0,
     limit: int = 100,
-    tipo: schemas.CategoryType = None,
+    tipo: schemas.TipoCategoria = None,
     db: Session = Depends(get_db)
 ):
     query = db.query(models.Category)
     if tipo:
-        query = query.filter(models.Category.type == tipo)
+        query = query.filter(models.Category.tipo == tipo)
     return query.offset(skip).limit(limit).all()
 
-#obtener categoria por id
-@router.get("/{categoria_id}", response_model=schemas.Category)
+# Obtener categoría por ID
+@router.get("/{categoria_id}", response_model=schemas.Categoria)
 def obtener_categoria(categoria_id: int, db: Session = Depends(get_db)):
     categoria = db.query(models.Category).filter(models.Category.id == categoria_id).first()
     if categoria is None:
         raise HTTPException(status_code=404, detail="Categoría no encontrada")
     return categoria
 
- #crear cetegoria
-@router.post("/", response_model=schemas.Category)
-def crear_categoria(categoria: schemas.CategoryCreate, db: Session = Depends(get_db)):
+# Crear categoría
+@router.post("/", response_model=schemas.Categoria)
+def crear_categoria(categoria: schemas.CrearCategoria, db: Session = Depends(get_db)):
     db_categoria = models.Category(**categoria.dict())
     try:
         db.add(db_categoria)
@@ -46,12 +47,11 @@ def crear_categoria(categoria: schemas.CategoryCreate, db: Session = Depends(get
             detail=f"No se pudo crear la categoría: {str(e)}"
         )
 
-
-#actualizar categoria
-@router.put("/{categoria_id}", response_model=schemas.Category)
+# Actualizar categoría
+@router.put("/{categoria_id}", response_model=schemas.Categoria)
 def actualizar_categoria(
     categoria_id: int,
-    categoria: schemas.CategoryCreate,
+    categoria: schemas.CrearCategoria,
     db: Session = Depends(get_db)
 ):
     db_categoria = db.query(models.Category).filter(models.Category.id == categoria_id).first()
@@ -71,7 +71,8 @@ def actualizar_categoria(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Error al actualizar la categoría: {str(e)}"
         )
-#eliminar categoria
+
+# Eliminar categoría
 @router.delete("/{categoria_id}")
 def eliminar_categoria(categoria_id: int, db: Session = Depends(get_db)):
     categoria = db.query(models.Category).filter(models.Category.id == categoria_id).first()
