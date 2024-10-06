@@ -31,7 +31,7 @@ class Categoria(CategoriaBase):
     id: int
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Esquemas de Item
 class ItemBase(BaseModel):
@@ -51,7 +51,7 @@ class Item(ItemBase):
     id: int
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Esquemas de Proveedor
 class ProveedorBase(BaseModel):
@@ -68,7 +68,7 @@ class Proveedor(ProveedorBase):
     id: int
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Esquemas de Item de Proveedor
 class ItemProveedorBase(BaseModel):
@@ -85,7 +85,7 @@ class ItemProveedor(ItemProveedorBase):
     id: int
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Esquemas de Movimiento de Inventario
 class MovimientoInventarioBase(BaseModel):
@@ -103,7 +103,7 @@ class MovimientoInventario(MovimientoInventarioBase):
     fecha: datetime
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Esquemas de Almacenamiento
 class AlmacenBase(BaseModel):
@@ -120,7 +120,7 @@ class Almacen(AlmacenBase):
     id: int
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Esquemas de Conteo de Inventario
 class ConteoInventarioBase(BaseModel):
@@ -137,4 +137,4 @@ class ConteoInventario(ConteoInventarioBase):
     fecha_ultimo_conteo: datetime
     
     class Config:
-        orm_mode = True
+        from_attributes = True
