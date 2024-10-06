@@ -18,15 +18,15 @@ def obtener_categorias(
     tipo: schemas.TipoCategoria = None,
     db: Session = Depends(get_db)
 ):
-    query = db.query(models.Category)
+    query = db.query(models.Categoria)
     if tipo:
-        query = query.filter(models.Category.tipo == tipo)
+        query = query.filter(models.Categoria.tipo == tipo)
     return query.offset(skip).limit(limit).all()
 
 # Obtener categoría por ID
 @router.get("/{categoria_id}", response_model=schemas.Categoria)
 def obtener_categoria(categoria_id: int, db: Session = Depends(get_db)):
-    categoria = db.query(models.Category).filter(models.Category.id == categoria_id).first()
+    categoria = db.query(models.Categoria).filter(models.Categoria.id == categoria_id).first()
     if categoria is None:
         raise HTTPException(status_code=404, detail="Categoría no encontrada")
     return categoria
@@ -34,7 +34,7 @@ def obtener_categoria(categoria_id: int, db: Session = Depends(get_db)):
 # Crear categoría
 @router.post("/", response_model=schemas.Categoria)
 def crear_categoria(categoria: schemas.CrearCategoria, db: Session = Depends(get_db)):
-    db_categoria = models.Category(**categoria.dict())
+    db_categoria = models.Categoria(**categoria.dict())
     try:
         db.add(db_categoria)
         db.commit()
@@ -54,7 +54,7 @@ def actualizar_categoria(
     categoria: schemas.CrearCategoria,
     db: Session = Depends(get_db)
 ):
-    db_categoria = db.query(models.Category).filter(models.Category.id == categoria_id).first()
+    db_categoria = db.query(models.Categoria).filter(models.Categoria.id == categoria_id).first()
     if db_categoria is None:
         raise HTTPException(status_code=404, detail="Categoría no encontrada")
     
@@ -75,7 +75,7 @@ def actualizar_categoria(
 # Eliminar categoría
 @router.delete("/{categoria_id}")
 def eliminar_categoria(categoria_id: int, db: Session = Depends(get_db)):
-    categoria = db.query(models.Category).filter(models.Category.id == categoria_id).first()
+    categoria = db.query(models.Categoria).filter(models.Categoria.id == categoria_id).first()
     if categoria is None:
         raise HTTPException(status_code=404, detail="Categoría no encontrada")
     
