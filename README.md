@@ -28,4 +28,5 @@ pip install -r requirements.txt
 
 ### iniciar el bot
 ```
-python main.py
+uvicorn main:app --reload
+```

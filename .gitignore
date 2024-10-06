@@ -3,3 +3,6 @@ __pycache__
 
 # entorno virtual
 inv
+
+# bd
+inventarios.db

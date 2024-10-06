@@ -1,24 +1,25 @@
+import uvicorn
 from fastapi import FastAPI
-from .routers import categories, items, inventory
-from .database.database import init_db 
+from routers.router import router as main_router
+from database.database import engine, Base
+from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(
-    title="Sistema de Inventario Restaurante",
-    description="API para gestionar el inventario de un restaurante",
-    version="1.0.0"
+app = FastAPI()
+
+# Middleware de CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["*"],
 )
 
-# Inicializar la base de datos
-init_db()
+# Crear tablas en la base de datos
+Base.metadata.create_all(bind=engine)
 
-# Incluir los routers
-app.include_router(categories.router)
-app.include_router(items.router)
-app.include_router(inventory.router)
+# Incluir el enrutador principal
+app.include_router(main_router)
 
-@app.get("/")
-def read_root():
-    return {
-        "message": "Bienvenido al sistema de inventario del restaurante",
-        "docs": "/docs"
-    }
+if __name__ == "__main__":
+    uvicorn.run(app, host="127.0.0.1", port=8000)
