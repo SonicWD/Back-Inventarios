@@ -6,125 +6,125 @@ from datetime import datetime
 import enum
 
 # Definimos los tipos de enum que corresponden a las categorías y perecibilidad
-class CategoryTypeEnum(str, enum.Enum):
-    INGREDIENT = "INGREDIENTE"
-    BEVERAGE = "BEBIDA"
-    UTENSIL = "UTENSILIO"
-    FURNITURE = "MOBILIARIO"
-    CLEANING = "LIMPIEZA"
-    OFFICE = "OFICINA"
+class TipoCategoriaEnum(str, enum.Enum):
+    INGREDIENTE = "INGREDIENTE"
+    BEBIDA = "BEBIDA"
+    UTENSILIO = "UTENSILIO"
+    MOBILIARIO = "MOBILIARIO"
+    LIMPIEZA = "LIMPIEZA"
+    OFICINA = "OFICINA"
     PICNIC = "PICNIC"
-    DECORATION = "DECORACION"
-    UNIFORM = "UNIFORME"
+    DECORACION = "DECORACION"
+    UNIFORME = "UNIFORME"
 
-class PerishableTypeEnum(str, enum.Enum):
-    PERISHABLE = "PERECEDERO"
-    NON_PERISHABLE = "NO_PERECEDERO"
+class TipoPerecibleEnum(str, enum.Enum):
+    PERECEDERO = "PERECEDERO"
+    NO_PERECEDERO = "NO_PERECEDERO"
 
 # Modelo de Categoría
-class Category(Base):
-    __tablename__ = "categories"
+class Categoria(Base):
+    __tablename__ = "categorias"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    type = Column(Enum(CategoryTypeEnum), nullable=False)
-    description = Column(String, nullable=True)
+    nombre = Column(String, nullable=False)
+    tipo = Column(Enum(TipoCategoriaEnum), nullable=False)
+    descripcion = Column(String, nullable=True)
 
     # Relación con Items
-    items = relationship("Item", back_populates="category")
+    items = relationship("Item", back_populates="categoria")
 
 # Modelo de Item
 class Item(Base):
     __tablename__ = "items"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    description = Column(String, nullable=True)
-    category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
-    perishable_type = Column(Enum(PerishableTypeEnum), nullable=True)
-    minimum_stock = Column(Integer, nullable=True, default=0)
-    unit = Column(String, nullable=True)
-    price = Column(Float, nullable=True)
-    is_active = Column(Boolean, default=True)
+    nombre = Column(String, nullable=False)
+    descripcion = Column(String, nullable=True)
+    categoria_id = Column(Integer, ForeignKey("categorias.id"), nullable=False)
+    tipo_perecible = Column(Enum(TipoPerecibleEnum), nullable=True)
+    stock_minimo = Column(Integer, nullable=True, default=0)
+    unidad = Column(String, nullable=True)
+    precio = Column(Float, nullable=True)
+    activo = Column(Boolean, default=True)
 
     # Relación con la categoría
-    category = relationship("Category", back_populates="items")
+    categoria = relationship("Categoria", back_populates="items")
 
     # Relación con SupplierItem
-    suppliers = relationship("SupplierItem", back_populates="item")
+    proveedores = relationship("ProveedorItem", back_populates="item")
 
     # Relación con movimientos de inventario
-    inventory_movements = relationship("InventoryMovement", back_populates="item")
+    movimientos_inventario = relationship("MovimientoInventario", back_populates="item")
 
-# Modelo de Proveedor (Supplier)
-class Supplier(Base):
-    __tablename__ = "suppliers"
+# Modelo de Proveedor
+class Proveedor(Base):
+    __tablename__ = "proveedores"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    contact_person = Column(String, nullable=True)
-    email = Column(String, nullable=True)
-    phone = Column(String, nullable=True)
-    address = Column(String, nullable=True)
+    nombre = Column(String, nullable=False)
+    persona_contacto = Column(String, nullable=True)
+    correo = Column(String, nullable=True)
+    telefono = Column(String, nullable=True)
+    direccion = Column(String, nullable=True)
 
     # Relación con SupplierItem
-    items = relationship("SupplierItem", back_populates="supplier")
+    items = relationship("ProveedorItem", back_populates="proveedor")
 
-# Modelo de relación entre Proveedores e Items (SupplierItem)
-class SupplierItem(Base):
-    __tablename__ = "supplier_items"
-
-    id = Column(Integer, primary_key=True, index=True)
-    supplier_id = Column(Integer, ForeignKey("suppliers.id"), nullable=False)
-    item_id = Column(Integer, ForeignKey("items.id"), nullable=False)
-    price = Column(Float, nullable=True)
-    minimum_order_quantity = Column(Integer, nullable=True)
-    lead_time_days = Column(Integer, nullable=True)
-
-    # Relación con Supplier y Item
-    supplier = relationship("Supplier", back_populates="items")
-    item = relationship("Item", back_populates="suppliers")
-
-# Modelo de Movimiento de Inventario (InventoryMovement)
-class InventoryMovement(Base):
-    __tablename__ = "inventory_movements"
+# Modelo de relación entre Proveedores e Items (ProveedorItem)
+class ProveedorItem(Base):
+    __tablename__ = "proveedor_items"
 
     id = Column(Integer, primary_key=True, index=True)
+    proveedor_id = Column(Integer, ForeignKey("proveedores.id"), nullable=False)
     item_id = Column(Integer, ForeignKey("items.id"), nullable=False)
-    quantity = Column(Float, nullable=False)
-    movement_type = Column(String, nullable=False)  # entrada/salida
-    reference_number = Column(String, nullable=True)
-    notes = Column(String, nullable=True)
-    date = Column(DateTime, server_default=func.now(), nullable=False)
+    precio = Column(Float, nullable=True)
+    cantidad_minima_orden = Column(Integer, nullable=True)
+    dias_entrega = Column(Integer, nullable=True)
+
+    # Relación con Proveedor y Item
+    proveedor = relationship("Proveedor", back_populates="items")
+    item = relationship("Item", back_populates="proveedores")
+
+# Modelo de Movimiento de Inventario (MovimientoInventario)
+class MovimientoInventario(Base):
+    __tablename__ = "movimientos_inventario"
+
+    id = Column(Integer, primary_key=True, index=True)
+    item_id = Column(Integer, ForeignKey("items.id"), nullable=False)
+    cantidad = Column(Float, nullable=False)
+    tipo_movimiento = Column(String, nullable=False)  # entrada/salida
+    numero_referencia = Column(String, nullable=True)
+    notas = Column(String, nullable=True)
+    fecha = Column(DateTime, server_default=func.now(), nullable=False)
 
     # Relación con Item
-    item = relationship("Item", back_populates="inventory_movements")
+    item = relationship("Item", back_populates="movimientos_inventario")
 
-# Modelo de Almacenamiento (Storage)
-class Storage(Base):
-    __tablename__ = "storages"
+# Modelo de Almacenamiento (Almacen)
+class Almacen(Base):
+    __tablename__ = "almacenes"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    type = Column(String, nullable=False)
-    temperature_range = Column(String, nullable=True)
-    capacity = Column(Float, nullable=False)
-    current_usage = Column(Float, nullable=False, default=0)
+    nombre = Column(String, nullable=False)
+    tipo = Column(String, nullable=False)
+    rango_temperatura = Column(String, nullable=True)
+    capacidad = Column(Float, nullable=False)
+    uso_actual = Column(Float, nullable=False, default=0)
 
     # Relación con conteo de inventario
-    inventory_counts = relationship("InventoryCount", back_populates="storage")
+    conteos_inventario = relationship("ConteoInventario", back_populates="almacen")
 
-# Modelo de Conteo de Inventario (InventoryCount)
-class InventoryCount(Base):
-    __tablename__ = "inventory_counts"
+# Modelo de Conteo de Inventario (ConteoInventario)
+class ConteoInventario(Base):
+    __tablename__ = "conteos_inventario"
 
     id = Column(Integer, primary_key=True, index=True)
     item_id = Column(Integer, ForeignKey("items.id"), nullable=False)
-    storage_id = Column(Integer, ForeignKey("storages.id"), nullable=False)
-    quantity = Column(Float, nullable=False)
-    counted_by = Column(String, nullable=False)
-    last_count_date = Column(DateTime, default=datetime.utcnow, nullable=False)
+    almacen_id = Column(Integer, ForeignKey("almacenes.id"), nullable=False)
+    cantidad = Column(Float, nullable=False)
+    contado_por = Column(String, nullable=False)
+    fecha_ultimo_conteo = Column(DateTime, default=datetime.utcnow, nullable=False)
 
-    # Relación con Item y Storage
+    # Relación con Item y Almacen
     item = relationship("Item")
-    storage = relationship("Storage", back_populates="inventory_counts")
+    almacen = relationship("Almacen", back_populates="conteos_inventario")

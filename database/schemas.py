@@ -3,48 +3,48 @@ from typing import Optional, List
 from datetime import datetime
 from enum import Enum
 
-class CategoryType(str, Enum):
-    INGREDIENT = "INGREDIENTE"
-    BEVERAGE = "BEBIDA"
-    UTENSIL = "UTENSILIO"
-    FURNITURE = "MOBILIARIO"
-    CLEANING = "LIMPIEZA"
-    OFFICE = "OFICINA"
+class TipoCategoria(str, Enum):
+    INGREDIENTE = "INGREDIENTE"
+    BEBIDA = "BEBIDA"
+    UTENSILIO = "UTENSILIO"
+    MOBILIARIO = "MOBILIARIO"
+    LIMPIEZA = "LIMPIEZA"
+    OFICINA = "OFICINA"
     PICNIC = "PICNIC"
-    DECORATION = "DECORACION"
-    UNIFORM = "UNIFORME"
+    DECORACION = "DECORACION"
+    UNIFORME = "UNIFORME"
 
-class PerishableType(str, Enum):
-    PERISHABLE = "PERECEDERO"
-    NON_PERISHABLE = "NO_PERECEDERO"
+class TipoPerecedero(str, Enum):
+    PERECEDERO = "PERECEDERO"
+    NO_PERECEDERO = "NO_PERECEDERO"
 
-# Schemas de Categoría
-class CategoryBase(BaseModel):
-    name: str = Field(..., description="Nombre de la categoría")
-    type: CategoryType = Field(..., description="Tipo de categoría")
-    description: Optional[str] = Field(None, description="Descripción de la categoría")
+# Esquemas de Categoría
+class CategoriaBase(BaseModel):
+    nombre: str = Field(..., description="Nombre de la categoría")
+    tipo: TipoCategoria = Field(..., description="Tipo de categoría")
+    descripcion: Optional[str] = Field(None, description="Descripción de la categoría")
 
-class CategoryCreate(CategoryBase):
+class CrearCategoria(CategoriaBase):
     pass
 
-class Category(CategoryBase):
+class Categoria(CategoriaBase):
     id: int
     
     class Config:
         orm_mode = True
 
-# Schemas de Item
+# Esquemas de Item
 class ItemBase(BaseModel):
-    name: str = Field(..., description="Nombre del item")
-    description: Optional[str] = Field(None, description="Descripción del item")
-    category_id: int = Field(..., description="ID de la categoría a la que pertenece")
-    perishable_type: Optional[PerishableType] = Field(None, description="Tipo de perecibilidad")
-    minimum_stock: Optional[int] = Field(0, description="Stock mínimo requerido")
-    unit: Optional[str] = Field(None, description="Unidad de medida")
-    price: Optional[float] = Field(None, description="Precio unitario")
-    is_active: bool = Field(True, description="Estado activo/inactivo del item")
+    nombre: str = Field(..., description="Nombre del item")
+    descripcion: Optional[str] = Field(None, description="Descripción del item")
+    categoria_id: int = Field(..., description="ID de la categoría a la que pertenece")
+    tipo_perecedero: Optional[TipoPerecedero] = Field(None, description="Tipo de perecibilidad")
+    stock_minimo: Optional[int] = Field(0, description="Stock mínimo requerido")
+    unidad: Optional[str] = Field(None, description="Unidad de medida")
+    precio: Optional[float] = Field(None, description="Precio unitario")
+    esta_activo: bool = Field(True, description="Estado activo/inactivo del item")
 
-class ItemCreate(ItemBase):
+class CrearItem(ItemBase):
     pass
 
 class Item(ItemBase):
@@ -53,88 +53,88 @@ class Item(ItemBase):
     class Config:
         orm_mode = True
 
-# Schemas de Proveedor
-class SupplierBase(BaseModel):
-    name: str = Field(..., description="Nombre del proveedor")
-    contact_person: Optional[str] = Field(None, description="Persona de contacto")
-    email: Optional[EmailStr] = Field(None, description="Correo electrónico")
-    phone: Optional[str] = Field(None, description="Teléfono")
-    address: Optional[str] = Field(None, description="Dirección")
+# Esquemas de Proveedor
+class ProveedorBase(BaseModel):
+    nombre: str = Field(..., description="Nombre del proveedor")
+    persona_contacto: Optional[str] = Field(None, description="Persona de contacto")
+    correo: Optional[EmailStr] = Field(None, description="Correo electrónico")
+    telefono: Optional[str] = Field(None, description="Teléfono")
+    direccion: Optional[str] = Field(None, description="Dirección")
 
-class SupplierCreate(SupplierBase):
+class CrearProveedor(ProveedorBase):
     pass
 
-class Supplier(SupplierBase):
+class Proveedor(ProveedorBase):
     id: int
     
     class Config:
         orm_mode = True
 
-# Schemas de Item de Proveedor
-class SupplierItemBase(BaseModel):
-    supplier_id: int = Field(..., description="ID del proveedor")
+# Esquemas de Item de Proveedor
+class ItemProveedorBase(BaseModel):
+    proveedor_id: int = Field(..., description="ID del proveedor")
     item_id: int = Field(..., description="ID del item")
-    price: Optional[float] = Field(None, description="Precio del proveedor")
-    minimum_order_quantity: Optional[int] = Field(None, description="Cantidad mínima de orden")
-    lead_time_days: Optional[int] = Field(None, description="Días de entrega")
+    precio: Optional[float] = Field(None, description="Precio del proveedor")
+    cantidad_minima_orden: Optional[int] = Field(None, description="Cantidad mínima de orden")
+    tiempo_entrega_dias: Optional[int] = Field(None, description="Días de entrega")
 
-class SupplierItemCreate(SupplierItemBase):
+class CrearItemProveedor(ItemProveedorBase):
     pass
 
-class SupplierItem(SupplierItemBase):
+class ItemProveedor(ItemProveedorBase):
     id: int
     
     class Config:
         orm_mode = True
 
-# Schemas de Movimiento de Inventario
-class InventoryMovementBase(BaseModel):
+# Esquemas de Movimiento de Inventario
+class MovimientoInventarioBase(BaseModel):
     item_id: int = Field(..., description="ID del item")
-    quantity: float = Field(..., description="Cantidad")
-    movement_type: str = Field(..., description="Tipo de movimiento (entrada/salida)")
-    reference_number: Optional[str] = Field(None, description="Número de referencia")
-    notes: Optional[str] = Field(None, description="Notas adicionales")
+    cantidad: float = Field(..., description="Cantidad")
+    tipo_movimiento: str = Field(..., description="Tipo de movimiento (entrada/salida)")
+    numero_referencia: Optional[str] = Field(None, description="Número de referencia")
+    notas: Optional[str] = Field(None, description="Notas adicionales")
 
-class InventoryMovementCreate(InventoryMovementBase):
+class CrearMovimientoInventario(MovimientoInventarioBase):
     pass
 
-class InventoryMovement(InventoryMovementBase):
+class MovimientoInventario(MovimientoInventarioBase):
     id: int
-    date: datetime
+    fecha: datetime
     
     class Config:
         orm_mode = True
 
-# Schemas de Almacenamiento
-class StorageBase(BaseModel):
-    name: str = Field(..., description="Nombre del almacén")
-    type: str = Field(..., description="Tipo de almacén")
-    temperature_range: Optional[str] = Field(None, description="Rango de temperatura")
-    capacity: float = Field(..., description="Capacidad total")
-    current_usage: float = Field(0, description="Uso actual")
+# Esquemas de Almacenamiento
+class AlmacenBase(BaseModel):
+    nombre: str = Field(..., description="Nombre del almacén")
+    tipo: str = Field(..., description="Tipo de almacén")
+    rango_temperatura: Optional[str] = Field(None, description="Rango de temperatura")
+    capacidad: float = Field(..., description="Capacidad total")
+    uso_actual: float = Field(0, description="Uso actual")
 
-class StorageCreate(StorageBase):
+class CrearAlmacen(AlmacenBase):
     pass
 
-class Storage(StorageBase):
+class Almacen(AlmacenBase):
     id: int
     
     class Config:
         orm_mode = True
 
-# Schemas de Conteo de Inventario
-class InventoryCountBase(BaseModel):
+# Esquemas de Conteo de Inventario
+class ConteoInventarioBase(BaseModel):
     item_id: int = Field(..., description="ID del item")
-    storage_id: int = Field(..., description="ID del almacén")
-    quantity: float = Field(..., description="Cantidad contada")
-    counted_by: str = Field(..., description="Responsable del conteo")
+    almacen_id: int = Field(..., description="ID del almacén")
+    cantidad: float = Field(..., description="Cantidad contada")
+    responsable: str = Field(..., description="Responsable del conteo")
 
-class InventoryCountCreate(InventoryCountBase):
+class CrearConteoInventario(ConteoInventarioBase):
     pass
 
-class InventoryCount(InventoryCountBase):
+class ConteoInventario(ConteoInventarioBase):
     id: int
-    last_count_date: datetime
+    fecha_ultimo_conteo: datetime
     
     class Config:
         orm_mode = True
