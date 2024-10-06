@@ -9,7 +9,36 @@ router = APIRouter(
     tags=["items"],
     responses={404: {"description": "No encontrado"}}
 )
+#obtener items
+@router.get("/", response_model=List[schemas.Item])
+def obtener_items(
+    skip: int = 0,
+    limit: int = 100,
+    categoria_id: int = None,
+    perishable_type: schemas.PerishableType = None,
+    is_active: bool = None,
+    db: Session = Depends(get_db)
+):
+    query = db.query(models.Item)
+    
+    if categoria_id:
+        query = query.filter(models.Item.category_id == categoria_id)
+    if perishable_type:
+        query = query.filter(models.Item.perishable_type == perishable_type)
+    if is_active is not None:
+        query = query.filter(models.Item.is_active == is_active)
+    
+    return query.offset(skip).limit(limit).all()
 
+#obtener item por id
+@router.get("/{item_id}", response_model=schemas.Item)
+def obtener_item(item_id: int, db: Session = Depends(get_db)):
+    item = db.query(models.Item).filter(models.Item.id == item_id).first()
+    if item is None:
+        raise HTTPException(status_code=404, detail="Item no encontrado")
+    return item
+
+#crear item
 @router.post("/", response_model=schemas.Item)
 def crear_item(item: schemas.ItemCreate, db: Session = Depends(get_db)):
     # Verificar si existe la categoría
@@ -32,33 +61,7 @@ def crear_item(item: schemas.ItemCreate, db: Session = Depends(get_db)):
             detail=f"No se pudo crear el item: {str(e)}"
         )
 
-@router.get("/", response_model=List[schemas.Item])
-def obtener_items(
-    skip: int = 0,
-    limit: int = 100,
-    categoria_id: int = None,
-    perishable_type: schemas.PerishableType = None,
-    is_active: bool = None,
-    db: Session = Depends(get_db)
-):
-    query = db.query(models.Item)
-    
-    if categoria_id:
-        query = query.filter(models.Item.category_id == categoria_id)
-    if perishable_type:
-        query = query.filter(models.Item.perishable_type == perishable_type)
-    if is_active is not None:
-        query = query.filter(models.Item.is_active == is_active)
-    
-    return query.offset(skip).limit(limit).all()
-
-@router.get("/{item_id}", response_model=schemas.Item)
-def obtener_item(item_id: int, db: Session = Depends(get_db)):
-    item = db.query(models.Item).filter(models.Item.id == item_id).first()
-    if item is None:
-        raise HTTPException(status_code=404, detail="Item no encontrado")
-    return item
-
+#actualizar item existente
 @router.put("/{item_id}", response_model=schemas.Item)
 def actualizar_item(
     item_id: int,
@@ -90,7 +93,7 @@ def actualizar_item(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Error al actualizar el item: {str(e)}"
         )
-
+#eliminar item
 @router.delete("/{item_id}")
 def eliminar_item(item_id: int, db: Session = Depends(get_db)):
     item = db.query(models.Item).filter(models.Item.id == item_id).first()
