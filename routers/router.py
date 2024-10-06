@@ -3,8 +3,8 @@ from .categorias import router as categorias_router
 from .items import router as items_router
 from .items_proveedor import router as items_proveedor_router
 from .proveedores import router as proveedores_router
-from routers.movimientos_inventario import router as movimientos_inventario_router
-from almacenes import router as almacenes_router
+from .movimientos_inventario import router as movimientos_inventario_router
+from .almacenes import router as almacenes_router
 # Crear el enrutador principal
 router = APIRouter()
 

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from typing import List
-from database.schemas import ItemProveedor, ItemProveedorCreate
+from database.schemas import ItemProveedor, CrearItemProveedor
 from database.database import get_db
 from database.models import ProveedorItem  # Asegúrate de que este sea el nombre correcto del modelo
 
@@ -26,7 +26,7 @@ def obtener_item_proveedor(item_proveedor_id: int, db: Session = Depends(get_db)
 
 # Crear un nuevo item de proveedor
 @router.post("/", response_model=ItemProveedor)
-def crear_item_proveedor(item_proveedor: ItemProveedorCreate, db: Session = Depends(get_db)):
+def crear_item_proveedor(item_proveedor: CrearItemProveedor, db: Session = Depends(get_db)):
     nuevo_item_proveedor = ProveedorItem(**item_proveedor.dict())
     db.add(nuevo_item_proveedor)
     db.commit()
@@ -35,7 +35,7 @@ def crear_item_proveedor(item_proveedor: ItemProveedorCreate, db: Session = Depe
 
 # Actualizar un item de proveedor existente
 @router.put("/{item_proveedor_id}", response_model=ItemProveedor)
-def actualizar_item_proveedor(item_proveedor_id: int, item_proveedor: ItemProveedorCreate, db: Session = Depends(get_db)):
+def actualizar_item_proveedor(item_proveedor_id: int, item_proveedor: CrearItemProveedor, db: Session = Depends(get_db)):
     item_proveedor_existente = db.query(ProveedorItem).filter(ProveedorItem.id == item_proveedor_id).first()
     if item_proveedor_existente is None:
         raise HTTPException(status_code=404, detail="Item de proveedor no encontrado")
