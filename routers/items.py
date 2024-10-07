@@ -43,7 +43,7 @@ def obtener_item(item_id: int, db: Session = Depends(get_db)):
 @router.post("/", response_model=schemas.Item)
 def crear_item(item: schemas.CrearItem, db: Session = Depends(get_db)):
     # Verificar si existe la categoría
-    if not db.query(models.Category).filter(models.Category.id == item.categoria_id).first():
+    if not db.query(models.Categoria).filter(models.Categoria.id == item.categoria_id).first():
         raise HTTPException(
             status_code=404,
             detail="La categoría especificada no existe"
@@ -75,7 +75,7 @@ def actualizar_item(
     
     # Verificar si existe la categoría si se está actualizando
     if item.categoria_id:
-        if not db.query(models.Category).filter(models.Category.id == item.categoria_id).first():
+        if not db.query(models.Category).filter(models.Categoria.id == item.categoria_id).first():
             raise HTTPException(
                 status_code=404,
                 detail="La categoría especificada no existe"
