@@ -38,11 +38,11 @@ class ItemBase(BaseModel):
     nombre: str = Field(..., description="Nombre del item")
     descripcion: Optional[str] = Field(None, description="Descripción del item")
     categoria_id: int = Field(..., description="ID de la categoría a la que pertenece")
-    tipo_perecedero: Optional[TipoPerecedero] = Field(None, description="Tipo de perecibilidad")
+    tipo_perecible: Optional[TipoPerecedero] = Field(None, description="Tipo de perecibilidad")
     stock_minimo: Optional[int] = Field(0, description="Stock mínimo requerido")
     unidad: Optional[str] = Field(None, description="Unidad de medida")
     precio: Optional[float] = Field(None, description="Precio unitario")
-    esta_activo: bool = Field(True, description="Estado activo/inactivo del item")
+    activo: bool = Field(True, description="Estado activo/inactivo del item")
 
 class CrearItem(ItemBase):
     pass

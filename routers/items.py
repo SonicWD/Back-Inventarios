@@ -9,6 +9,7 @@ router = APIRouter(
     tags=["items"],
     responses={404: {"description": "No encontrado"}}
 )
+#   
 
 # Obtener items
 @router.get("/", response_model=List[schemas.Item])
@@ -17,7 +18,7 @@ def obtener_items(
     limit: int = 100,
     categoria_id: int = None,
     tipo_perecedero: schemas.TipoPerecedero = None,
-    esta_activo: bool = None,
+    activo: bool = None,
     db: Session = Depends(get_db)
 ):
     query = db.query(models.Item)
@@ -26,8 +27,8 @@ def obtener_items(
         query = query.filter(models.Item.categoria_id == categoria_id)
     if tipo_perecedero:
         query = query.filter(models.Item.tipo_perecedero == tipo_perecedero)
-    if esta_activo is not None:
-        query = query.filter(models.Item.esta_activo == esta_activo)
+    if activo is not None:
+        query = query.filter(models.Item.activo == activo)
     
     return query.offset(skip).limit(limit).all()
 
@@ -75,7 +76,7 @@ def actualizar_item(
     
     # Verificar si existe la categoría si se está actualizando
     if item.categoria_id:
-        if not db.query(models.Category).filter(models.Categoria.id == item.categoria_id).first():
+        if not db.query(models.Categoria).filter(models.Categoria.id == item.categoria_id).first():
             raise HTTPException(
                 status_code=404,
                 detail="La categoría especificada no existe"
