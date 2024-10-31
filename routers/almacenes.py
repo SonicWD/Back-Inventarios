@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
-from database import models, schemas
+from database.schemas import almacenamiento_schema as schemas
+from database.models.almacen_model import Almacen
 from database.database import get_db
 
 router = APIRouter(
@@ -17,13 +18,13 @@ def obtener_almacenes(
     limit: int = 100,
     db: Session = Depends(get_db)
 ):
-    query = db.query(models.Almacen)
+    query = db.query(Almacen)
     return query.offset(skip).limit(limit).all()
 
 # Obtener un almacén por ID
 @router.get("/{storage_id}", response_model=schemas.Almacen)
 def obtener_almacen(storage_id: int, db: Session = Depends(get_db)):
-    almacen = db.query(models.Almacen).filter(models.Almacen.id == storage_id).first()
+    almacen = db.query(Almacen).filter(Almacen.id == storage_id).first()
     if almacen is None:
         raise HTTPException(status_code=404, detail="Almacén no encontrado")
     return almacen
@@ -31,7 +32,7 @@ def obtener_almacen(storage_id: int, db: Session = Depends(get_db)):
 # Crear un nuevo almacén
 @router.post("/", response_model=schemas.Almacen)
 def crear_almacen(almacen: schemas.CrearAlmacen, db: Session = Depends(get_db)):
-    db_almacen = models.Almacen(**almacen.dict())
+    db_almacen = Almacen(**almacen.dict())
     try:
         db.add(db_almacen)
         db.commit()
@@ -51,7 +52,7 @@ def actualizar_almacen(
     almacen: schemas.CrearAlmacen,
     db: Session = Depends(get_db)
 ):
-    db_almacen = db.query(models.Almacen).filter(models.Almacen.id == storage_id).first()
+    db_almacen = db.query(Almacen).filter(Almacen.id == storage_id).first()
     if db_almacen is None:
         raise HTTPException(status_code=404, detail="Almacén no encontrado")
     
@@ -72,7 +73,7 @@ def actualizar_almacen(
 # Eliminar un almacén
 @router.delete("/{storage_id}")
 def eliminar_almacen(storage_id: int, db: Session = Depends(get_db)):
-    almacen = db.query(models.Almacen).filter(models.Almacen.id == storage_id).first()
+    almacen = db.query(Almacen).filter(Almacen.id == storage_id).first()
     if almacen is None:
         raise HTTPException(status_code=404, detail="Almacén no encontrado")
     

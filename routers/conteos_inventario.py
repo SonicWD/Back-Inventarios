@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
-from database import models, schemas
+from database.schemas import conteo_schema as schemas
+from database.models.conteo_model import ConteoInventario
 from database.database import get_db
 
 router = APIRouter(
@@ -17,13 +18,13 @@ def obtener_conteos_inventario(
     limit: int = 100,
     db: Session = Depends(get_db)
 ):
-    query = db.query(models.ConteoInventario)
+    query = db.query(ConteoInventario)
     return query.offset(skip).limit(limit).all()
 
 # Obtener un conteo de inventario por ID
 @router.get("/{count_id}", response_model=schemas.ConteoInventario)
 def obtener_conteo_inventario(count_id: int, db: Session = Depends(get_db)):
-    conteo = db.query(models.ConteoInventario).filter(models.ConteoInventario.id == count_id).first()
+    conteo = db.query(ConteoInventario).filter(ConteoInventario.id == count_id).first()
     if conteo is None:
         raise HTTPException(status_code=404, detail="Conteo de inventario no encontrado")
     return conteo
@@ -31,7 +32,7 @@ def obtener_conteo_inventario(count_id: int, db: Session = Depends(get_db)):
 # Crear un nuevo conteo de inventario
 @router.post("/", response_model=schemas.ConteoInventario)
 def crear_conteo_inventario(conteo: schemas.CrearConteoInventario, db: Session = Depends(get_db)):
-    db_conteo = models.ConteoInventario(**conteo.dict())
+    db_conteo = ConteoInventario(**conteo.dict())
     try:
         db.add(db_conteo)
         db.commit()
@@ -51,7 +52,7 @@ def actualizar_conteo_inventario(
     conteo: schemas.CrearConteoInventario,
     db: Session = Depends(get_db)
 ):
-    db_conteo = db.query(models.ConteoInventario).filter(models.ConteoInventario.id == count_id).first()
+    db_conteo = db.query(ConteoInventario).filter(ConteoInventario.id == count_id).first()
     if db_conteo is None:
         raise HTTPException(status_code=404, detail="Conteo de inventario no encontrado")
     
@@ -72,7 +73,7 @@ def actualizar_conteo_inventario(
 # Eliminar un conteo de inventario
 @router.delete("/{count_id}")
 def eliminar_conteo_inventario(count_id: int, db: Session = Depends(get_db)):
-    conteo = db.query(models.ConteoInventario).filter(models.ConteoInventario.id == count_id).first()
+    conteo = db.query(ConteoInventario).filter(ConteoInventario.id == count_id).first()
     if conteo is None:
         raise HTTPException(status_code=404, detail="Conteo de inventario no encontrado")
     

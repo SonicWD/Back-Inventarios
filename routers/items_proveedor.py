@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from typing import List
-from database.schemas import ItemProveedor, CrearItemProveedor
+from database.schemas.item_proveedor_schema import ItemProveedor, CrearItemProveedor
 from database.database import get_db
-from database.models import ProveedorItem  # Asegúrate de que este sea el nombre correcto del modelo
+from database.models.proveedor_item_model import ProveedorItem
 
 router = APIRouter(
     prefix="/items_proveedor",

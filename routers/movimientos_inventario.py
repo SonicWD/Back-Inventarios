@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
-from database import models, schemas
+from database.schemas import movimiento_schema as schemas
 from database.database import get_db
+from database.models.movimiento_model import MovimientoInventario
+
 
 router = APIRouter(
     prefix="/movimientos_inventario",
@@ -17,13 +19,13 @@ def obtener_movimientos_inventario(
     limit: int = 100,
     db: Session = Depends(get_db)
 ):
-    query = db.query(models.MovimientoInventario)
+    query = db.query(MovimientoInventario)
     return query.offset(skip).limit(limit).all()
 
 # Obtener un movimiento por ID
 @router.get("/{movement_id}", response_model=schemas.MovimientoInventario)
 def obtener_movimiento(movement_id: int, db: Session = Depends(get_db)):
-    movimiento = db.query(models.MovimientoInventario).filter(models.MovimientoInventario.id == movement_id).first()
+    movimiento = db.query(MovimientoInventario).filter(MovimientoInventario.id == movement_id).first()
     if movimiento is None:
         raise HTTPException(status_code=404, detail="Movimiento no encontrado")
     return movimiento
@@ -31,7 +33,7 @@ def obtener_movimiento(movement_id: int, db: Session = Depends(get_db)):
 # Crear un nuevo movimiento de inventario
 @router.post("/", response_model=schemas.MovimientoInventario)
 def crear_movimiento(movimiento: schemas.CrearMovimientoInventario, db: Session = Depends(get_db)):
-    db_movimiento = models.MovimientoInventario(**movimiento.dict())
+    db_movimiento = MovimientoInventario(**movimiento.dict())
     try:
         db.add(db_movimiento)
         db.commit()
@@ -51,7 +53,7 @@ def actualizar_movimiento(
     movimiento: schemas.CrearMovimientoInventario,
     db: Session = Depends(get_db)
 ):
-    db_movimiento = db.query(models.MovimientoInventario).filter(models.MovimientoInventario.id == movement_id).first()
+    db_movimiento = db.query(MovimientoInventario).filter(MovimientoInventario.id == movement_id).first()
     if db_movimiento is None:
         raise HTTPException(status_code=404, detail="Movimiento no encontrado")
     
@@ -72,7 +74,7 @@ def actualizar_movimiento(
 # Eliminar un movimiento de inventario
 @router.delete("/{movement_id}")
 def eliminar_movimiento(movement_id: int, db: Session = Depends(get_db)):
-    movimiento = db.query(models.MovimientoInventario).filter(models.MovimientoInventario.id == movement_id).first()
+    movimiento = db.query(MovimientoInventario).filter(MovimientoInventario.id == movement_id).first()
     if movimiento is None:
         raise HTTPException(status_code=404, detail="Movimiento no encontrado")
     
