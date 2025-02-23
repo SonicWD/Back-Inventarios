@@ -2,13 +2,11 @@ from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi import HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
 
 # Contexto para el hashing de contraseñas
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Configuración del esquema OAuth2
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/login")
 
 # Clave secreta y algoritmo para JWT
 SECRET_KEY = "kafklajf<<<<>><><&&&@@afaf__9o9n009n"

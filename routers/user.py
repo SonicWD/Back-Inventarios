@@ -1,14 +1,16 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 from database.database import get_db
 from database.models.user_model import UserModel
 from database.schemas.user_schemas import (UserCreate, UserUpdate, UserOut,
                                             LoginUser, Token)
 from utils.security import (decode_access_token, verify_password, get_password_hash,
-                            create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES)
+                            create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES,
+                            SECRET_KEY, ALGORITHM)
+from jose import JWTError, jwt
 from datetime import timedelta
 from fastapi.security import OAuth2PasswordBearer
-
+from fastapi.responses import JSONResponse
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 router = APIRouter(
@@ -93,16 +95,30 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
 
 
 # Iniciar sesión y obtener token
-@router.post("/login", response_model=Token)
+@router.post("/login", response_model=dict)
 def login(user: LoginUser, db: Session = Depends(get_db)):
-    db_user = db.query(UserModel).filter(
-        UserModel.username == user.username).first()
+    db_user = db.query(UserModel).filter(UserModel.username == user.username).first()
     if not db_user or not verify_password(user.password, db_user.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="Incorrect username or password")
 
+    # Crear el access token
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(data={"sub": db_user.username},
                                        expires_delta=access_token_expires)
 
-    return {"access_token": access_token, "token_type": "bearer"}
+    # Crear el refresh token
+    refresh_token_expires = timedelta(days=7)  # Mayor duración
+    refresh_token = create_access_token(data={"sub": db_user.username, "type": "refresh"},
+                                        expires_delta=refresh_token_expires)
+
+    # Configurar el response con cookies para el refresh token
+    response = JSONResponse(content={
+        "access_token": access_token,
+        "token_type": "bearer"
+    })
+    response.set_cookie(
+        key="refresh_token", value=refresh_token, httponly=True, secure=True
+    )
+
+    return response
