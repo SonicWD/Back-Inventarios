@@ -1,21 +1,28 @@
-import uvicorn
 from fastapi import FastAPI
-from routers.router import router as main_router
-from database.database import engine, Base
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI
+import uvicorn
 import signal
 import sys
+
+from routers.router import router as main_router
+from database.database import engine, Base
+from utils.security import ALGORITHM, SECRET_KEY
+from routers.middelware import AuthMiddleware
+
 
 app = FastAPI()
 
 # Middleware de CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(AuthMiddleware, secret_key=SECRET_KEY, algorithm=ALGORITHM)
 
 # Crear tablas en la base de datos
 Base.metadata.create_all(bind=engine)
