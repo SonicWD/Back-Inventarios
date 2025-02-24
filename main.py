@@ -34,7 +34,7 @@ signal.signal(signal.SIGTERM, receive_signal)
 
 @app.get("/")
 def read_root():
-    return {"Hola": "Mundo"}
+    return {"Hola": "Mundo, por favo entrar a /docs# pofavo"}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
