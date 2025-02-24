@@ -12,7 +12,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):
         # Excluir la ruta de login
-        if request.url.path == "/users/login" or request.url.path == "/docs":
+        if request.method == "OPTIONS" or request.url.path in ["/users/login", "/docs"]:
             return await call_next(request)
 
         # Obtener el token de los headers
@@ -20,8 +20,8 @@ class AuthMiddleware(BaseHTTPMiddleware):
 
         # Si no hay token, retornar 401
         if not token:
-            # print("_____________---PATH---_____________(error)", request.url.path)
-            raise HTTPException(status_code=401, detail="No autorizado")
+           print("_____________---PATH---_____________(error)", request.url.path)
+           raise HTTPException(status_code=401, detail="No autorizado")
 
         # Si hay token, continuar con la solicitud
         response = await call_next(request)
