@@ -7,6 +7,9 @@ from .movimientos_inventario import router as movimientos_inventario_router
 from .almacenes import router as almacenes_router
 from .conteos_inventario import router as conteos_inventario_router
 from .user import router as users_router
+from .home import router as home_router
+
+
 # Crear el enrutador principal
 router = APIRouter()
 
@@ -19,3 +22,4 @@ router.include_router(movimientos_inventario_router)
 router.include_router(almacenes_router)
 router.include_router(conteos_inventario_router)
 router.include_router(users_router)
+router.include_router(home_router)
