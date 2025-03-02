@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentación - Inventarios</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #4a4a77;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            justify-items: center;
+        }
+        
+        nav ul li {
+            background: #fff;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+            cursor: pointer;
+            width: 80%;
+        }
+
+        nav ul li a {
+            display: block;
+            text-decoration: none;
+            color: #333;
+            padding: 10px;
+        }
+
+        nav ul li:hover {
+            background: #e4e4f9;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Documentación del Inventarios</h1>
+        <p>Bienvenido a la documentación de los módulos del proyecto.</p>
+    </header>
+
+    <nav>
+        <h2>Módulos disponibles:</h2>
+        <ul>
+            <li><a href="api/index.html"></a>API</li>
+            <li><a href="core/index.html"></a>Core</li>
+            <li><a href="models/index.html"></a>Models</li>
+            <li><a href="repositories/index.html"></a>Repositories</li>
+            <li><a href="schemas/index.html"></a>Schemas</li>
+            <li><a href="services/index.html"></a>Services</li>
+        </ul>
+    </nav>
+
+    <footer>
+        <p>Generado por <strong>TrumanDev;)</strong>.</p>
+    </footer>
+    <script>
+        document.querySelectorAll('nav ul li').forEach(item => {
+            item.addEventListener('click', () => {
+                const link = item.querySelector('a');
+                if (link) {
+                    window.location.href = link.href;
+                }
+            });
+        });
+    </script>
+    
+</body>
+</html>
